@@ -17,8 +17,144 @@
 
   const uid = () => "id-" + Math.random().toString(36).slice(2, 9);
 
+  const DEFAULT_TRAVEL = {
+    version: "travel-command-center-v1",
+    flightsVersion: "Air France v1",
+    flightStatus: "Confirm live details in the Air France app before travel.",
+    flights: [
+      {
+        id: "outbound-rdu-cdg-cph",
+        airline: "Air France",
+        bookingRef: "",
+        flightNumber: "",
+        departAirport: "RDU",
+        departTime: "2026-06-12 evening",
+        arriveAirport: "CPH",
+        arriveTime: "2026-06-13 morning/afternoon",
+        seats: "",
+        baggage: "",
+        notes: "Outbound route: RDU -> CDG -> CPH. Confirm exact times and flight numbers in Air France.",
+        boardingPassSaved: false,
+      },
+      {
+        id: "return-cph-cdg-rdu",
+        airline: "Air France",
+        bookingRef: "",
+        flightNumber: "",
+        departAirport: "CPH",
+        departTime: "2026-06-20 morning",
+        arriveAirport: "RDU",
+        arriveTime: "2026-06-20",
+        seats: "",
+        baggage: "",
+        notes: "Return route: CPH -> CDG -> RDU. Confirm exact times and flight numbers in Air France.",
+        boardingPassSaved: false,
+      },
+    ],
+    maps: {
+      copenhagen: false,
+      herning: false,
+      malmo: false,
+    },
+    checklist: {
+      passports: false,
+      boardingPasses: false,
+      insurance: false,
+      chargers: false,
+      meds: false,
+      roaming: false,
+    },
+    offlineMaps: {
+      title: "Offline Map Prep",
+      regions: [
+        {
+          id: "copenhagen-zealand",
+          name: "Copenhagen / Zealand",
+          queries: ["Copenhagen", "Copenhagen Airport", "Indre By", "Zealand Denmark"],
+          checklist: [
+            { id: "google-map", label: "Download Google Maps offline area", done: false },
+            { id: "basecamp", label: "Save apartment and Copenhagen Airport", done: false },
+            { id: "transit-hubs", label: "Save Kongens Nytorv and Copenhagen Central Station", done: false },
+            { id: "walking", label: "Star walkable family stops in Indre By", done: false },
+          ],
+        },
+        {
+          id: "herning",
+          name: "Herning",
+          queries: ["Herning", "MCH Messecenter Herning", "Birk Centerpark"],
+          checklist: [
+            { id: "google-map", label: "Download Herning offline area", done: false },
+            { id: "train-stops", label: "Save Herning Messecenter and Birk Centerpark stations", done: false },
+            { id: "minecraft", label: "Save MCH Messecenter / Minecraft Experience", done: false },
+            { id: "backup-food", label: "Mark backup food near stations", done: false },
+          ],
+        },
+        {
+          id: "malmo",
+          name: "Malmo",
+          queries: ["Malmo", "Malmo Central Station", "Malmo Castle", "Folkets Park"],
+          checklist: [
+            { id: "google-map", label: "Download Malmo offline area", done: false },
+            { id: "station", label: "Save Malmo Central Station", done: false },
+            { id: "day-route", label: "Save Malmohus Castle, Lilla Torg, and Folkets Park", done: false },
+            { id: "oresund", label: "Save Oresund train route notes", done: false },
+          ],
+        },
+      ],
+    },
+    readiness: {
+      title: "Readiness Checklist",
+      checklist: [
+        { id: "passports", label: "Passports checked and packed", done: false },
+        { id: "cards", label: "Travel cards enabled and backup card packed", done: false },
+        { id: "roaming", label: "Phone roaming / eSIM plan ready", done: false },
+        { id: "chargers", label: "Chargers, adapters, and battery packs packed", done: false },
+        { id: "meds", label: "Medications and kid essentials packed in carry-on", done: false },
+        { id: "insurance", label: "Travel insurance and key documents saved offline", done: false },
+        { id: "tickets", label: "Attraction and train tickets saved offline", done: false },
+      ],
+    },
+    emergency: {
+      Denmark: [
+        { label: "Emergency", number: "112", notes: "Police, ambulance, and fire." },
+        { label: "Police non-emergency", number: "114", notes: "Use for non-urgent police matters in Denmark." },
+        { label: "Medical helpline", number: "1813", notes: "Capital Region urgent medical advice." },
+      ],
+      Sweden: [
+        { label: "Emergency", number: "112", notes: "Police, ambulance, and fire." },
+        { label: "Police non-emergency", number: "114 14", notes: "Use for non-urgent police matters in Sweden." },
+        { label: "Healthcare advice", number: "1177", notes: "Medical advice line in Sweden." },
+      ],
+    },
+  };
+
+  function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function withDefaults(value, defaults) {
+    if (Array.isArray(defaults)) return Array.isArray(value) ? value : clone(defaults);
+    if (!defaults || typeof defaults !== "object") return value === undefined ? defaults : value;
+    const out = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+    Object.keys(defaults).forEach((key) => {
+      out[key] = withDefaults(out[key], defaults[key]);
+    });
+    return out;
+  }
+
+  function normalizeStateShape(s) {
+    if (!s || typeof s !== "object") s = emptyState();
+    if (!Array.isArray(s.trips)) s.trips = [];
+    if (!Array.isArray(s.places)) s.places = [];
+    if (typeof s.activeTripId === "undefined") s.activeTripId = null;
+    if (!s.meta || typeof s.meta !== "object" || Array.isArray(s.meta)) s.meta = {};
+    if (!s.meta.created) s.meta.created = Date.now();
+    s.meta.travel = withDefaults(s.meta.travel, DEFAULT_TRAVEL);
+    return s;
+  }
+
   function emptyState() {
-    return { trips: [], places: [], activeTripId: null, meta: { created: Date.now() } };
+    return normalizeStateShape({ trips: [], places: [], activeTripId: null, meta: { created: Date.now() } });
   }
 
   // Normalize a raw place (from seed or parser) into stored form.
@@ -47,7 +183,7 @@
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) return normalizeStateShape(JSON.parse(raw));
     } catch (e) { /* ignore */ }
     return null;
   }
@@ -68,11 +204,13 @@
     state.trips = [trip];
     state.activeTripId = trip.id;
     state.places = s.places.map(normPlace);
+    state.meta.travel = withDefaults(state.meta.travel, DEFAULT_TRAVEL);
     persist(); notify();
   }
 
   function ensureSeeded() {
     if (!state || !state.trips) { seedFromDefault(); }
+    else { state = normalizeStateShape(state); persist(); }
   }
 
   // ---- queries -------------------------------------------------------------
@@ -114,6 +252,59 @@
   function updatePlaceNotes(id, notes) {
     const p = state.places.find((x) => x.id === id);
     if (p) { p.notes = notes; persist(); notify(); }
+  }
+
+  function getTravel() {
+    state = normalizeStateShape(state);
+    return state.meta.travel;
+  }
+
+  function setTravel(nextTravel) {
+    if (!nextTravel || typeof nextTravel !== "object" || Array.isArray(nextTravel)) {
+      throw new Error("Travel data must be an object.");
+    }
+    state = normalizeStateShape(state);
+    state.meta.travel = withDefaults(clone(nextTravel), DEFAULT_TRAVEL);
+    persist(); notify();
+    return state.meta.travel;
+  }
+
+  function updateTravelSection(section, value) {
+    if (!section || typeof section !== "string") throw new Error("Travel section is required.");
+    const next = clone(getTravel());
+    next[section] = value;
+    return setTravel(next);
+  }
+
+  function addPlace(place) {
+    const np = normPlace(place || {});
+    const ex = matchExisting(np);
+    if (ex) {
+      Object.keys(np).forEach((key) => {
+        const cur = ex[key];
+        const incoming = np[key];
+        if ((cur === "" || cur == null || cur === "Unsorted" || cur === "Other") && incoming !== "" && incoming != null) {
+          ex[key] = incoming;
+        }
+      });
+      persist(); notify();
+      return ex;
+    }
+    state.places.push(np);
+    persist(); notify();
+    return np;
+  }
+
+  function addPlaceFromMapsLink(input) {
+    input = input || {};
+    return addPlace({
+      name: input.name,
+      maps: input.maps || input.mapsLink,
+      category: input.category || "Other",
+      sub: input.sub || "",
+      loc: input.loc || "Unsorted",
+      notes: input.notes || "",
+    });
   }
 
   // ---- MERGE ENGINE --------------------------------------------------------
@@ -223,6 +414,27 @@
   function reset() { seedFromDefault(); }
   function wipe() { state = emptyState(); persist(); notify(); }
 
+  function validateRestoreObject(obj) {
+    if (!obj || typeof obj !== "object" || Array.isArray(obj)) throw new Error("Backup must be a state object.");
+    if ("trips" in obj && !Array.isArray(obj.trips)) throw new Error("Backup trips must be an array.");
+    if ("places" in obj && !Array.isArray(obj.places)) throw new Error("Backup places must be an array.");
+    if ("meta" in obj && (!obj.meta || typeof obj.meta !== "object" || Array.isArray(obj.meta))) throw new Error("Backup meta must be an object.");
+    if ("activeTripId" in obj && obj.activeTripId !== null && typeof obj.activeTripId !== "string") throw new Error("Backup activeTripId must be a string or null.");
+  }
+
+  function toJSON() {
+    state = normalizeStateShape(state);
+    return JSON.stringify(state, null, 2);
+  }
+
+  function restoreJSON(jsonTextOrObject) {
+    const obj = typeof jsonTextOrObject === "string" ? JSON.parse(jsonTextOrObject) : clone(jsonTextOrObject);
+    validateRestoreObject(obj);
+    state = normalizeStateShape(obj);
+    persist(); notify();
+    return state;
+  }
+
   // serialize the active trip + full directory back to markdown (for export/share)
   function toMarkdown() {
     const trip = activeTrip();
@@ -263,6 +475,7 @@
     subscribe, getState, ensureSeeded, seedFromDefault, reset, wipe,
     activeTrip, places, placeBySlug, placeByName, daysForPlace,
     setActiveTrip, updatePlaceNotes,
-    planImport, applyImport, toMarkdown,
+    getTravel, setTravel, updateTravelSection, addPlace, addPlaceFromMapsLink,
+    planImport, applyImport, toMarkdown, toJSON, restoreJSON,
   };
 })();

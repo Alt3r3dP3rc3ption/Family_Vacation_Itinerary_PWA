@@ -363,3 +363,119 @@ ul { margin: 0; padding: 0; list-style: none; }
 .fade-in { animation: fadeIn .3s ease both; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to {opacity:1; transform:none;} }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- Travel ------------------------------------------------ */
+.travel-stack {
+  display: flex; flex-direction: column; gap: 10px; margin: 0 16px;
+}
+.travel-card {
+  background: var(--bg-elev); border-radius: var(--radius); padding: 14px 16px;
+  box-shadow: var(--shadow-card);
+}
+.travel-card-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.travel-kicker {
+  font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.travel-card-title {
+  font-size: 17px; font-weight: 700; color: var(--label); line-height: 1.2;
+}
+.travel-route {
+  margin-top: 9px; font-size: 18px; font-weight: 600; color: var(--label);
+}
+.travel-muted {
+  color: var(--label-3); font-size: 13px; line-height: 1.35;
+}
+.travel-status {
+  flex: none; border-radius: 20px; padding: 5px 9px; font-size: 12px; font-weight: 700;
+  color: #ff9500; background: rgba(255,149,0,0.14);
+}
+.travel-status.ready {
+  color: var(--maps); background: rgba(31,157,87,0.14);
+}
+.travel-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
+  margin-top: 12px;
+}
+.travel-grid div {
+  min-width: 0; border-radius: 10px; background: rgba(118,118,128,0.10);
+  padding: 9px; font-size: 14px; color: var(--label); overflow-wrap: anywhere;
+}
+.travel-grid span {
+  display: block; margin-bottom: 3px; font-size: 11px; font-weight: 700; color: var(--label-3);
+  text-transform: uppercase; letter-spacing: 0.03em;
+}
+.travel-note {
+  margin-top: 12px; color: var(--label-2); font-size: 14px; line-height: 1.45;
+}
+.travel-actions,
+.travel-links {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+}
+.travel-links { margin: 0 16px 8px; }
+.travel-danger { color: #ff3b30; background: rgba(255,59,48,0.12); }
+.travel-form {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 16px 4px;
+  background: var(--bg-elev); border-radius: var(--radius); padding: 14px;
+  box-shadow: var(--shadow-card);
+}
+.travel-field {
+  display: flex; flex-direction: column; gap: 6px; min-width: 0;
+}
+.travel-field span {
+  font-size: 12px; font-weight: 700; color: var(--label-3); text-transform: uppercase; letter-spacing: 0.03em;
+}
+.travel-field input,
+.travel-field select,
+.travel-field textarea {
+  width: 100%; border: none; border-radius: 10px; background: rgba(118,118,128,0.12);
+  color: var(--label); font-family: inherit; font-size: 15px; padding: 10px 11px;
+}
+.travel-field textarea {
+  min-height: 78px; resize: vertical; line-height: 1.4;
+}
+.travel-field input:focus,
+.travel-field select:focus,
+.travel-field textarea:focus {
+  outline: 2px solid var(--accent);
+}
+.travel-wide,
+.travel-form-actions {
+  grid-column: 1 / -1;
+}
+.travel-form-actions {
+  display: flex; gap: 10px;
+}
+.travel-checkline {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 48px; padding: 12px 16px; position: relative;
+}
+.group .travel-checkline + .travel-checkline::before {
+  content: ""; position: absolute; top: 0; left: 16px; right: 0;
+  border-top: 0.5px solid var(--sep);
+}
+.travel-line-title {
+  font-size: 16px; color: var(--label); line-height: 1.25;
+}
+.travel-toggle {
+  width: 51px; height: 31px; border-radius: 999px; flex: none; padding: 2px;
+  background: rgba(120,120,128,0.28); transition: background .18s;
+}
+.travel-toggle span {
+  display: block; width: 27px; height: 27px; border-radius: 50%; background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.24); transition: transform .18s;
+}
+.travel-toggle.on {
+  background: var(--accent);
+}
+.travel-toggle.on span {
+  transform: translateX(20px);
+}
+
+@media (max-width: 360px) {
+  .travel-form,
+  .travel-grid {
+    grid-template-columns: 1fr;
+  }
+}

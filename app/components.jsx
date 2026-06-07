@@ -81,6 +81,7 @@ const TABS = [
   { id: "itinerary", label: "Itinerary", icon: Icon.itinerary },
   { id: "directory", label: "Directory", icon: Icon.directory },
   { id: "map", label: "Map", icon: Icon.map },
+  { id: "travel", label: "Travel", icon: Icon.globe },
   { id: "import", label: "Import", icon: Icon.importt },
   { id: "settings", label: "Settings", icon: Icon.settings },
 ];

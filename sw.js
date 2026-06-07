@@ -1,5 +1,5 @@
 /* Service worker — caches the app shell for offline use after first load. */
-const CACHE = "trip-itinerary-v2";
+const CACHE = "trip-itinerary-v3";
 const SHELL = [
   "./",
   "./index.html",
@@ -13,6 +13,7 @@ const SHELL = [
   "./app/itinerary.jsx",
   "./app/directory.jsx",
   "./app/map.jsx",
+  "./app/travel.jsx",
   "./app/import.jsx",
   "./app/settings.jsx",
   "./app/app.jsx",

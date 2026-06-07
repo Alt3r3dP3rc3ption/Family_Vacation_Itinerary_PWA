@@ -4,6 +4,7 @@ function SettingsScreen({ onChanged, tick }) {
   const trip = window.Store.activeTrip();
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmWipe, setConfirmWipe] = useState(false);
+  const restoreJsonRef = useRef(null);
 
   const md = () => window.Store.toMarkdown();
 
@@ -35,6 +36,36 @@ function SettingsScreen({ onChanged, tick }) {
     toast("Markdown exported");
   }
 
+  function backupName(ext) {
+    const title = trip ? trip.title : "trip";
+    const stamp = new Date().toISOString().slice(0, 10);
+    return title.replace(/[^a-z0-9]+/gi, "-").toLowerCase() + "-" + stamp + "." + ext;
+  }
+
+  function downloadJson() {
+    const blob = new Blob([window.Store.toJSON()], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = backupName("json");
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast("JSON backup exported");
+  }
+
+  async function restoreJsonFile(e) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const text = await file.text();
+      window.Store.restoreJSON(text);
+      onChanged();
+      toast("JSON backup restored");
+    } catch (err) {
+      toast("Couldn't restore JSON backup");
+    }
+  }
+
   async function copyText() {
     try { await navigator.clipboard.writeText(md()); toast("Copied to clipboard"); }
     catch (e) { toast("Couldn't copy"); }
@@ -49,9 +80,14 @@ function SettingsScreen({ onChanged, tick }) {
           title="Share via iOS Share Sheet" sub="Send to Notes, Messages, Mail…" onClick={shareSheet} />
         <Row icon={<Icon.doc style={{ width: 18, height: 18 }} />} color="#3478F7"
           title="Export Markdown file" sub="Download a .md backup" onClick={downloadMd} />
+        <Row icon={<Icon.doc style={{ width: 18, height: 18 }} />} color="#1f9d57"
+          title="Export JSON backup" sub="Full local copy, including Travel data" onClick={downloadJson} />
+        <Row icon={<Icon.refresh style={{ width: 18, height: 18 }} />} color="#AF52DE"
+          title="Restore JSON backup" sub="Replace local data from a backup file" onClick={() => restoreJsonRef.current && restoreJsonRef.current.click()} />
         <Row icon={<Icon.copy style={{ width: 18, height: 18 }} />} color="#8E8E93"
           title="Copy as text" sub="Paste anywhere" onClick={copyText} />
       </div>
+      <input ref={restoreJsonRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={restoreJsonFile} />
       <div className="info-card">
         <strong>About the Notes app & sharing</strong>
         <div style={{ marginTop: 6 }}>Your trip is stored privately on this device. Tap <strong>Share</strong> to drop a copy into Apple Notes (or any app) whenever you want to share it — you decide who sees it and when.</div>
@@ -83,7 +119,7 @@ function SettingsScreen({ onChanged, tick }) {
       <div className="section-hdr">Data</div>
       <div className="group">
         <Row icon={<Icon.refresh style={{ width: 18, height: 18 }} />} color="#FF9500"
-          title="Restore sample trip" sub="Reload the Copenhagen demo data"
+          title="Restore bundled Copenhagen trip" sub="Reload the built-in Copenhagen itinerary"
           onClick={() => setConfirmReset(true)} />
       </div>
       <div style={{ margin: "10px 16px 0" }}>
@@ -103,7 +139,7 @@ function SettingsScreen({ onChanged, tick }) {
       {confirmReset && (
         <div style={{ margin: "10px 16px 0", display: "flex", gap: 10 }}>
           <button className="btn secondary" onClick={() => setConfirmReset(false)}>Cancel</button>
-          <button className="btn" onClick={() => { window.Store.reset(); setConfirmReset(false); onChanged(); toast("Sample trip restored"); }}>Restore demo</button>
+          <button className="btn" onClick={() => { window.Store.reset(); setConfirmReset(false); onChanged(); toast("Bundled trip restored"); }}>Restore bundled trip</button>
         </div>
       )}
 

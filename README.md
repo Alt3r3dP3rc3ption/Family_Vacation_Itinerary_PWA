@@ -6,13 +6,13 @@ All your data stays **on your device** (in the browser's local storage). Nothing
 
 ## Live site
 
-Once GitHub Pages is enabled (see below), the app is served at:
+The app is served from GitHub Pages at:
 
 ```
-https://<your-username>.github.io/<repo-name>/
+https://alt3r3dp3rc3ption.github.io/Family_Vacation_Itinerary_PWA/
 ```
 
-## Enabling GitHub Pages
+## GitHub Pages
 
 1. Push these files to the repository (keep the `app/` folder intact).
 2. In the repo, go to **Settings → Pages**.
@@ -39,18 +39,21 @@ manifest.webmanifest    PWA manifest (name, icons, colors)
 sw.js                   Service worker (offline caching)
 app/
   styles.css            iOS-style design system
-  seed.js               Sample trip data (Copenhagen demo)
+  seed.js               Bundled Copenhagen trip data
   store.js              On-device storage + merge / de-dupe engine
   parser.js             Markdown + PDF import parser
   components.jsx        Shared UI (nav, tabs, sheets, icons)
   itinerary.jsx         Itinerary tab (day-by-day timeline)
   directory.jsx         Directory tab (by category / location)
   map.jsx               Map tab (Leaflet pins)
+  travel.jsx            Travel tab (flights, safety, offline prep)
   import.jsx            Import tab (upload + merge review)
   settings.jsx          Settings & share tab
   app.jsx               Root app / routing
   icon-192.png          App icons
   icon-512.png
+tests/
+  verify-pwa.ps1        Static verification for the GitHub Pages PWA
 ```
 
 ## Notes
@@ -60,5 +63,8 @@ app/
   *Supersede* — re-importing the same file changes nothing.
 - **Sharing:** use the in-app **Share** button to send a copy of your itinerary
   to Notes, Messages, Mail, etc. via the system share sheet.
+- **Travel:** store Air France flight basics, emergency numbers, offline map prep,
+  readiness checks, and places from Google Maps links.
 - **Your data:** stored locally per-device. Clearing your browser data (or using
-  the in-app *Erase all data*) removes it. Use **Export Markdown** to keep a backup.
+  the in-app *Erase all data*) removes it. Use **Export JSON backup** to keep a
+  full local copy, including Travel data.

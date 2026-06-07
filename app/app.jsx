@@ -37,6 +37,9 @@ function App() {
         <div style={{ display: tab === "map" ? "flex" : "none", flexDirection: "column", height: "100%" }}>
           <MapScreen onOpenPlace={openPlace} active={tab === "map"} tick={tick} />
         </div>
+        <div style={{ display: tab === "travel" ? "flex" : "none", flexDirection: "column", height: "100%" }}>
+          <TravelScreen tick={tick} />
+        </div>
         <div style={{ display: tab === "import" ? "flex" : "none", flexDirection: "column", height: "100%" }}>
           <ImportScreen onImported={() => { refresh(); setTab("directory"); }} tick={tick} />
         </div>
