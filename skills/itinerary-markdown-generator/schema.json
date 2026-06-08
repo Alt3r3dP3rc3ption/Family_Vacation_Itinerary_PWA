@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Family Vacation Itinerary PWA Authoring Schema",
+  "type": "object",
+  "required": ["meta", "days"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string" },
+        "dates": { "type": "string" },
+        "basecamp": { "type": "string" },
+        "tagline": { "type": "string" }
+      }
+    },
+    "days": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["date", "title", "events"],
+        "properties": {
+          "emoji": { "type": "string" },
+          "date": { "type": "string" },
+          "title": { "type": "string" },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["description"],
+              "properties": {
+                "label": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "places": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array"
+      }
+    }
+  }
+}
