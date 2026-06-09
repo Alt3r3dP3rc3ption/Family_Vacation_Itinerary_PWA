@@ -1,5 +1,5 @@
 /* Service worker — caches the app shell for offline use after first load. */
-const CACHE = "trip-itinerary-v3";
+const CACHE = "trip-itinerary-v4";
 const SHELL = [
   "./",
   "./index.html",
@@ -14,6 +14,7 @@ const SHELL = [
   "./app/directory.jsx",
   "./app/map.jsx",
   "./app/travel.jsx",
+  "./app/trip-wizard.jsx",
   "./app/import.jsx",
   "./app/settings.jsx",
   "./app/app.jsx",
@@ -31,7 +32,6 @@ self.addEventListener("activate", (e) => {
   );
 });
 
-// cache-first for app shell + same-origin; network-first fallback to cache otherwise
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
