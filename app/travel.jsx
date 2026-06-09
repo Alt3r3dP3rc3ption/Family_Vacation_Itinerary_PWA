@@ -263,6 +263,8 @@ function TravelScreen({ tick }) {
 
   return (
     <Screen title="Travel" subtitle="Command center">
+      {typeof TripWizard === "function" && <TripWizard />}
+
       <div className="section-hdr">Flights <span className="count">Air France v1</span></div>
       <div className="travel-links">
         <button className="pill" onClick={() => safeOpen("airfrance://", "https://wwws.airfrance.us/en/information/prepare/services/app-air-france")}>Air France App</button>
